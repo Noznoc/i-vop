@@ -1,0 +1,1159 @@
+<html>
+	<head>
+		<title>PWYP Visualization</title>
+
+		<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no'/>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
+
+		<!-- D3.js -->	
+	    <script src="http://d3js.org/d3.v3.js"></script>
+		<script src="src/d3.stretched.chord.js"></script>
+		<script src="src/d3.layout.chord.sort.js"></script>
+
+		<!-- jQuery -->
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+		<!-- Import mapbox API -->
+		<script src='https://api.mapbox.com/mapbox.js/v2.3.0/mapbox.js'></script>
+		
+		<!-- Import Leaflet stylesheet -->
+		<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+
+		<!-- Import stylesheet -->
+		<link rel="stylesheet" type="text/css" href="style/style.css">
+
+		<!-- Import Tablesort -->
+		<script type="text/javascript" src="src/tablesorter-master/jquery.tablesorter.js"></script>
+
+		<!-- Import Tabletop -->
+		<script type="text/javascript" src="src/tabletop.js"></script>
+
+		<!-- Import Leaflet plugin for marker cluster -->
+		<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.css' rel='stylesheet' />
+		<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.Default.css' rel='stylesheet' />
+		<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js'></script>
+
+		<!-- Leaflet Easy Button -->
+		<script type="text/javascript" src="src/easy-button.js"></script>
+		<link rel="stylesheet" type="text/css" href="src/easy-button.css"/>
+
+		<!-- Font Awesome Icons -->
+		<script src="https://use.fontawesome.com/8ea25ff7df.js"></script>
+	</head>
+	<body>
+		<div id="container">
+			<!-- Header -->
+			<div id="header">
+				<div class="header-top-banner">
+					<ul>
+						<li id="aboutButton"><span onclick="openInfo()"><a data-toggle="tooltip" title="To learn about the project">ABOUT THE PROJECT</a></span></li>
+						<li id="dataButton"><span onclick="openData()"><a data-toggle="tooltip" title="To see source data">DATA SOURCE</a></span></li>
+						<li id="glossaryButton"><span onclick="openGlossary()"><a data-toggle="tooltip" title="To see glossary">GLOSSARY</a></span></li>
+					</ul>
+					<p> FILTERS </p>
+				</div>
+				<!-- Header sidebar's About tab -->
+				<div id="about" class="header-side-banner">
+				  	<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+				  	<div>
+				  		<h1>ABOUT THE PROJECT: </h1>
+					  	<h3 class='title'>Welcome to PWYP Canada's interactive dashboard that highlights payments from extractive companies to government organizations, Indigenous peoples, and projects within Canada</h3>
+						<h3 class='title'>Click Canada to see payments to the federal government or use the above filters to specify what data you want to see</h3>
+						<h3 class='title'>When you click the 'Apply Filter' button above, a similar payment flow visualization as below will appear and different markers will appear on the map</h3>
+						<img src="images/intro.png" style="text-align: center; width: 100%; border: solid white"></img>
+						<h3 class='title' target="_blank">The map was devloped through <a href="https://www.mapbox.com/mapbox.js/api/v3.0.1/" target="_blank">Mapbox.js</a>. Mapbox hosts <a href="https://www.openstreetmap.org/" target="_blank">OpenStreetMap</a>'s data </h3>
+						<h3 class='title'>The payment flow visualization was modified from <a href="http://www.visualcinnamon.com/2015/08/stretched-chord.html" target="_blank">Visual Cinnamon's Stretched Chord D3 visualization</a></h3>
+						<h3 class='title'>The following open source technologies were used: </h3>
+						<a href="https://github.com/d3/d3/wiki" target="_blank">D3</a>, <a href="https://github.com/Leaflet" target="_blank">Leaflet</a>, <a href="https://www.google.ca/sheets/about/" target="_blank">Google Sheets</a>, <a href="https://fonts.google.com/" target="_blank">Google Fonts</a>, <a href="http://sass-lang.com/" target="_blank">Sass</a>, <a href="http://bourbon.io/" target="_blank">Bourbon</a>, and <a href="http://neat.bourbon.io/" target="_blank">Bourbon Neat</a>
+					</div>
+				</div>
+
+				<!-- Header sidebar's Data tab -->
+				<div id="data" class="header-side-banner">
+					<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+				  	<div>
+				  		<h1>DATA: </h1>
+				  		<iframe src="https://docs.google.com/spreadsheets/d/1Va9VnsSve1OWvSLD7L1B3diVEWBxCc0Bm0DXCdPt6ro/pubhtml"></iframe>
+				  	</div>
+				</div>
+
+				<!-- Header sidebar's Glossary tab -->
+				<div id="glossary" class="header-side-banner">
+					<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+					<div>
+						<ul>
+							<h1>GLOSSARY:</h1>
+							<h2>Payment Types</h2>
+							<li><h3>Royalties: payments to earn rights to extract oil and gas resources</h3></li>
+							<li><h3>Fees: General payments for a project or to a government. For details, refer to the link below</h3></li>
+							<li><h3>Infrastructure: payments for infrastructure development (e.g., roads)</h3></li>
+							<li><h3>Taxes: income, profit, and/or production tax payments a company pays to a project or government</h3></li>
+							<h3><a class='link' href="http://www.nrcan.gc.ca/sites/www.nrcan.gc.ca/files/mining-materials/PDF/ESTMA%E2%80%93Guidance.pdf" target="_blank">Click here for further information</a></h3>
+						</ul>
+					</div>
+				</div>
+
+				<!-- Header filters -->
+				<ul class="header-top-filters">
+					<li class="filter-menu"><span><a class="companyFilter">Extractive Company: <select id="companySelection" class="filter"></select></a></span></li> <!-- Company filter -->
+					<li class="filter-menu"><span><a class="paymentTypeFilter">Payment Type: <select id="paymentTypeSelection" class="filter"></select></a></span></li> <!-- Payment type filter -->
+					<li class="filter-menu"><span><a class="projectFilter">Payment Type: <select id="projectSelection" class="filter"></select></a></span></li> <!-- Payment type filter -->
+					<!-- Add additional filter here. Copy paste code line above, rename id (not class) and change filter text info-->
+					<li class="filter-button" id="buttonSubmit"><div id="filterSubmit" class="submit" data-toggle="tooltip" title="Click here to filter your selection"> Apply </a></li> <!-- Submit filter -->
+					<li class="filter-button" id="buttonReset"><div class="submit" id="filterReset" data-toggle="tooltip" title="Click here to reset the filters to all data"> Reset </div></li> <!-- Reset filter -->
+				</ul>
+			</div>
+
+			<!-- Body includes: body text, visualization, table, and map -->
+			<div id="body">
+				<!-- Content that appears on landing page --> 
+				<div id="intro">
+					<div class="intro-text">
+						<h3 class='title'>Welcome to PWYP Canada's interactive dashboard that highlights payments from extractive companies to government organizations, Indigenous peoples, and projects within Canada</h3>
+						<h3 class='title'>Click Canada to see payments to the federal government or use the above filters to specify what data you want to see</h3>
+						<h3 class='title'>When you click the 'Apply' button above, either a payment flow visualization or table as seen below will appear and different markers will appear on the map</h3>
+						<h3 class='title'>We recommend running this visualization in Chrome or Firefox</h3>
+					</div>
+					<img src="images/intro.png" style="text-align: center; width: 100%; margin-left: 20px;"></img>
+				</div>
+
+				<!-- Where the payment flow visualization is binned once created in the script tag -->
+				<div id='visualization'>
+					<div id="visualization-chart"></div>
+				</div>
+
+				<!-- Where the table is binned once created in the script tag -->
+				<div id="table"> 
+					<h2 id="table-legend"></h2>
+					<table id="table-responsive">
+					</table>
+				</div>
+
+				<!-- Where the no data message is binned-->
+				<div id="nodata">
+					<h1> This current filter has no data. Please reselect </h1>
+				</div>
+				<div id='map'></div>
+			</div>
+
+			<!-- Footer -->
+			<div id="footer">
+				<br/>
+				<img class="pwyp" src="images/pwypc_logo.png">
+				<img class="opennorth" src="images/opennorth_logo.png">
+				<p>© 2017 | Designed and Developed by OpenNorth</p>
+			</div>
+
+			<script type="text/javascript">
+
+				window.onload = function() {init()}; // Initialize TableTop on window load
+
+				// Open About navigation sidebar 
+				function openInfo() {
+					$('#aboutButton').addClass('active'); // Make the About button active 
+					if($('#dataButton').hasClass('active')) // If the Data button is active, make it unactive
+					    $('#dataButton').removeClass('active');
+					if($('#glossaryButton').hasClass('active')) // If the Glossary button is active, make it unactive 
+					    $('#glossaryButton').removeClass('active');
+					document.getElementById("about").style.width = "400px"; // Open the About sidebar navigation
+					document.getElementById("data").style.width = "0"; 
+					document.getElementById("glossary").style.width = "0";
+				}
+
+				// Open Data navigation sidebar
+				function openData(){
+					$('#dataButton').addClass('active'); // Make the Data button active 
+					if($('#aboutButton').hasClass('active')) // If the About button is active, make it unactive 
+					    $('#aboutButton').removeClass('active');
+					if($('#glossaryButton').hasClass('active')) // If the Glossary button is active, make it unactive 
+					    $('#glossaryButton').removeClass('active');
+					document.getElementById("data").style.width = "400px"; // Open the Data sidebar navigation
+					document.getElementById("about").style.width = "0";
+					document.getElementById("glossary").style.width = "0";
+				}
+
+				// Open Glossary sidebar 
+				function openGlossary() {
+					$('#glossaryButton').addClass('active'); // Make the About button active 
+					if($('#dataButton').hasClass('active')) // If the Data button is active, make it unactive
+					    $('#dataButton').removeClass('active');
+					if($('#aboutButton').hasClass('active')) // If the About button is active, make it unactive
+					    $('#aboutButton').removeClass('active');
+					document.getElementById("glossary").style.width = "400px"; // Open the About sidebar navigation
+					document.getElementById("data").style.width = "0";
+					document.getElementById("about").style.width = "0"; 
+				}
+
+				// Closes the navigation sidebar 
+				function closeNav() {
+					if($('#aboutButton').hasClass('active')) // Delelect About button if selected
+					    $('#aboutButton').removeClass('active');
+					if($('#dataButton').hasClass('active')) // Deselect Data button if selected
+					    $('#dataButton').removeClass('active');
+					if($('#glossaryButton').hasClass('active')) // Deselect Glossary button if selected
+					    $('#glossaryButton').removeClass('active');
+				    document.getElementById("data").style.width = "0";
+				    document.getElementById("about").style.width = "0";
+				    document.getElementById("glossary").style.width = "0";
+				}
+
+				var public_spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1Va9VnsSve1OWvSLD7L1B3diVEWBxCc0Bm0DXCdPt6ro/pubhtml'; // URL for Data Google Sheet 
+
+				function init() { // Function that initializes TableTop. Tabletop will pull the data from the Google Sheet that stores all the da
+				    Tabletop.init( { key: public_spreadsheet_url,
+				                     callback: showInfo,
+				                     simpleSheet: true } )
+				}
+
+				function showInfo(data, tabletop) { // Function to show data from Google Sheet
+		
+				    L.mapbox.accessToken = 'pk.eyJ1IjoianVsY29ueiIsImEiOiJjajAxZjBzenUwNjg2MzNxcnNqMmRndHk2In0.c_6Z_kM1Kno651JoOBDOuQ'; // Access token for Mapbox API
+
+					var map = L.mapbox.map('map', 'mapbox.streets', { // Creates new map and associated map id
+						zoomControl: false,
+						scrollWheelZoom: false, // Prevents scroll zoom
+						center: [64.8462344,-110.1214561], // Centers map
+						zoom: 3, // Zoom tile level
+						minZoom: 3, 
+						maxZoom: 8 
+					});
+
+					new L.Control.Zoom({ position: 'topright' }).addTo(map); // Create a zoom pad that is on the top right corner of map
+					
+					// This function finds all companies names and removes any duplicates, so that it returns an array of each unique extractive company 
+					function findCompanies(data) {
+						var companies = [];
+						var company = [];
+						for (var i = 0; i < data.length; i++){
+							companies.push((data[i].CompanyName.toUpperCase())); 
+						}
+
+						$.each(companies, function(i, el){ // Removes any duplicates
+							if($.inArray(el, company) === -1) company.push(el);
+						});
+
+						return company
+					}
+
+					var allCompanies = findCompanies(data);	// Variable that stores the array of unique company names
+					var companySelection = document.getElementById("companySelection"); // Create a variable that will represent the id location of where the filter will be stored in the HTML
+					companySelection.innerHTML = '<option value="ALL">ALL</option>'; // Add the "All" option
+					for (var i = 0; i < allCompanies.length; i++){ // This for loop will run through the array and will output each individual company as an option
+				    	companySelection.innerHTML += '<option value="' + allCompanies[i] + '">' + allCompanies[i] + '</option>'; 
+					}
+
+					// This function finds all payment types and removes any duplicates, so that it returns an array of each unique payment type
+					function findPaymentTypes(data){
+						var paymentTypes = [];
+						var paymentType = [];
+						for (var i = 0; i < data.length; i++){
+							paymentTypes.push((data[i].PaymentType.toUpperCase())); 
+						}
+
+						$.each(paymentTypes, function(i, el){ // Removes any duplicates
+							if($.inArray(el, paymentType) === -1) paymentType.push(el);
+						});
+
+						return paymentType
+					}
+
+					// Same script as above, but with all payment types 
+					var allPaymentTypes = findPaymentTypes(data);
+					var paymentTypeSelection = document.getElementById("paymentTypeSelection");
+					paymentTypeSelection.innerHTML = '<option value="ALL">ALL</option>';
+					for (var i = 0; i < allPaymentTypes.length; i++){
+				    	paymentTypeSelection.innerHTML += '<option value="' + allPaymentTypes[i] + '">' + allPaymentTypes[i] + '</option>';
+					}
+
+					// This function finds all projects (i.e., government, project, or indigenous group that is paid) and removes any duplicates, so that it returns an array of each unique goverment/project that received payments
+					function findProjects(data){
+						var projects = [];
+						var project = [];
+						for (var i = 0; i < data.length; i++){
+							projects.push((data[i].ProjectOrGovernment.toUpperCase())); 
+						}
+
+						$.each(projects, function(i, el){ // Removes any duplicates
+							if($.inArray(el, project) === -1) project.push(el);
+						});
+
+						return project
+					}
+
+					// Same script as above, but with all projects/governments 
+					var fullProjects = ["GOVERNMENT", "INDIGENOUS", "PROJECT"];
+					var allProjects = findProjects(data);
+					var projectSelection = document.getElementById("projectSelection");
+					projectSelection.innerHTML = '<option value="ALL">ALL</option>';
+					for (var i = 0; i < allProjects.length; i++){
+				    	projectSelection.innerHTML += '<option value="' + allProjects[i] + '">' + fullProjects[i] + '</option>';
+					}
+					
+				    var coordinates; // Variable to store coordinates
+					var marker; // Variable to store markers 
+				   	var popupContent; // Variable to store popup content
+				   	var all_markers = []; // Variable to store all the markers that are created 
+				   	var overlayMaps; // Variable for the legend (seen on the map)
+
+				   	// This creates a cluster group to cluster the markers 
+				   	var cluster = L.markerClusterGroup({ 
+				    	spiderfyOnMaxZoom: true,
+				    	maxClusterRadius: 50
+					});
+				   	
+				   	// This function creates a cluster from the markers
+				   	function addClusters(marker){
+				   		cluster.addLayer(marker).addTo(map);
+				   	}
+
+				   	// This function removes a cluster
+				   	function removeClusters(all_markers){
+				   		for (var i in all_markers){
+				   			cluster.removeLayer(all_markers[i]);
+				   		}
+				   	}
+
+				   	// This function creates commas between to separate the amounts (e.g., 1000 --> becomes 1,000 with this function)
+				   	function numberWithCommas(x) {
+					    var parts = x.toString().split(".");
+					    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+					    return parts.join(".");
+					}
+
+					// from Jack Moore http://www.jacklmoore.com/notes/rounding-in-javascript/. This function rounds the amounts so the value is not have too many decimal points
+					function round(value, decimals) {
+					 	return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+					}
+
+				   	// This function creates the markers for the map 
+				    function addMarkers(data) {
+					    for (var i = 0; i < data.length; i++){ // For loop to run through all elements within a province array (e.g., w)
+							if (data[i].ProjectOrGovernment == "P") { // If the point represents a project, create the following icon style
+						    	var markerIcon = L.icon({ 
+									iconUrl: 'images/proj_icon.svg',
+									iconSize: [30, 30],
+									iconAnchor: [15, 30],
+									popupAnchor: [0, -10],
+									shadowUrl: '',
+									shadowRetinaUrl: '',
+									shadowSize: [68, 95],
+									shadowAnchor: [22, 94]
+								});
+							} else if (data[i].ProjectOrGovernment == "G") { // If the point represents a government organization, create the following icon style
+								var markerIcon = L.icon({ 
+									iconUrl: 'images/gov_icon.svg',
+									iconSize: [30, 30],
+									iconAnchor: [15, 30],
+									popupAnchor: [0, -10],
+									shadowUrl: '',
+									shadowRetinaUrl: '',
+									shadowSize: [68, 95],
+									shadowAnchor: [22, 94]
+								});
+							} else { // If the point represents Indigenous peoples, create the following icon style
+								var markerIcon = L.icon({ 
+									iconUrl: 'images/indigenous_icon.svg',
+									iconSize: [30, 30],
+									iconAnchor: [15, 30],
+									popupAnchor: [0, -10],
+									shadowUrl: '',
+									shadowRetinaUrl: '',
+									shadowSize: [68, 95],
+									shadowAnchor: [22, 94]
+								});
+							}
+
+							// Now that the style is created... if the data has a latitude and longitude value that is not zero (to make sure that a lat/long value exists in the Google Sheet) ,create a marker, a marker popup, and then store it 
+					    	if (data[i].Latitude !== "" && data[i].Longitude !== ""){
+					    		coordinates = new L.LatLng(data[i].Latitude, data[i].Longitude); // Create coordinates from the latitude and longitude 
+					    		marker = new L.Marker(coordinates, {icon: markerIcon, riseOnHover: true, value: [data[i].Name, data[i].CompanyName, data[i].ProjectOrGovernment, data[i].PaymentType, data[i].Id]}); // Create a new marker from the coordinates and style icon. Add values associated with the marker so that it can be accessed with the filters 
+
+					    		// The following block of code creates the text for each popup on the map. Depending on certain marker values, certain popups will have different text
+					    		popupContent = "<div class='popup' align='center'><div class='popupHeader'><h2><strong><a href='" + data[i].CompanyLink + "' target='_blank'>" + data[i].CompanyName + "</a></strong></h2></div><br/><div>Paid ";
+					    		if (data[i].Credit == "N") { // If the marker's total amount is not credit 
+					    			popupContent += "$" + numberWithCommas(round(parseFloat(data[i].CADAmount), 2)) + " (CAD) (" + data[i].PaymentType + ")";
+					    		} else { // If the marker's total amount is credit 
+					    			popupContent += "- $" + numberWithCommas(round(parseFloat(data[i].CADAmount), 2)) + " (CAD) (" + data[i].PaymentType + ")";
+					    		} 
+					    		if (data[i].ProjectOrGovernment == "P" && data[i].Source != "") { // If the marker's payment is for a project and it does have a data source 
+					    			popupContent += " for the </div><br/><div><a class='sourceLinks' href='" + data[i].Source + "' target='_blank'>" + data[i].Name + " project</a></div><br/><div>Reported on </div>" + data[i].ReportEndDate + "</div>";
+					    		} 
+
+					    		if (data[i].ProjectOrGovernment == "P" && data[i].Source == "") { // If the marker's payment is for a project and it doesn't have a data source
+					    			popupContent += " for the </div><br/><div>" + data[i].Name + " project</a></div><br/><div>Reported on </div>" + data[i].ReportEndDate + "</div>";
+					    		}
+					    		if (data[i].ProjectOrGovernment != "P" && data[i].Source != ""){ // If the marker's payment is not for a project and it does not have a data source
+					    			popupContent += " to </div><br/><div><a class='sourceLinks' href='" + data[i].Source + "' target='_blank'>" + data[i].Name + "</a></div><br/><div>Reported on </div>" + data[i].ReportEndDate + "</div>";
+					    		}
+
+					    		if (data[i].ProjectOrGovernment != "P" && data[i].Source == "") { // If the marker's payment is not for a project and it doesn't have a data source
+					    			popupContent += " to </div><br/><div>" + data[i].Name + "</a></div><br/><div>Reported on </div>" + data[i].ReportEndDate + "</div>";
+					    		}
+					
+					    		marker.bindPopup(popupContent).openPopup(); // Binds the popup to the marker
+					    		all_markers.push(marker) // Push the marker to the all_markers array 
+					    	}
+					    }
+
+					    return all_markers; // Return all the markers  
+					}
+
+					var all_markers = addMarkers(data); // Store all the markers in the all_markers array 
+
+					// This creates a back button on the map so users can easily zoom out 
+					L.easyButton('<span class="filterButton">&larrhk;</span>', function(){
+						map.setView([64.8462344,-110.1214561], 3)
+					}, "Zoom out to Canada").addTo(map);
+
+					// This creates the content for the map's legend 
+					overlayMaps = {
+						'<div class="legend"><img src="images/gov_icon.svg" height="30" width="30"> <strong> Governments </strong><br/><img src="images/indigenous_icon.svg" height="30" width="30"><strong> Indigenous Peoples </strong><br/><img src="images/proj_icon.svg" height="30" width="30"><strong> Projects </strong></div>': ''
+					};
+
+					// This initiates the legend onto the map 
+					L.control.layers("",overlayMaps, {
+						collapsed: false,
+						position: 'topleft'
+					}).addTo(map);
+
+					// This modifies the features on the legend to have have checkboxes (only text)
+					var checks = document.querySelectorAll('[type = "checkbox"]');
+					checks[0].outerHTML = '<div type="checkbox" class="leaflet-control-layers-selector" disabled=""></div>'
+
+					var coords; 
+					var	geojson = [];
+					var country = "";
+
+					// Function that creates a construtor for each country's information (country name and geojson link)
+					function countryInfo (country, link){
+						this.country = country;
+						this.link = link;
+					};
+
+					// Function builds the contructor for each row recorded in the Google Sheet
+					function buildGeojson(data) {
+						var allGeojson = [];
+						for (var i in data) {
+							if (data[i].CountryLevel == "Y"){
+								country = new countryInfo(data[i].Country, data[i].GeoJSON)
+								allGeojson.push(country)
+							}
+						}
+						return allGeojson;
+					}
+
+					// Function removes any duplicate constructors so that there is only one contructor for each country
+					function uniqueGeojson(arr) {
+						return arr.reduce(function (p, c) {
+						    // create an identifying id from the object values
+						    var id = [c.x, c.y].join('|');
+
+						    // if the id is not found in the temp array
+						    // add the object to the output array
+						    // and add the key to the temp array
+						    if (p.temp.indexOf(id) === -1) {
+						      p.out.push(c);
+						      p.temp.push(id);
+						    }
+
+						return p;
+
+						// return the uniqueGeojson array
+						}, { temp: [], out: [] }).out;
+					}
+
+					var countries = uniqueGeojson(buildGeojson(data)); // Stores all countries information (country name and geojson link) into an array
+
+					var source; // Variable to store the source of the GEOJSON (province polygon) data
+
+					// Style for when user hovers over province polygon
+					var highlightStyle = {
+					    color: '#507ebf', 
+					    weight: 3,
+					    opacity: 0.6,
+					    fillOpacity: 0.65,
+					    fillColor: '#f2f2f2'
+					};
+
+					// Default style for province polygons
+					var defaultStyle = {
+			            color: "#507ebf",
+			            weight: 2,
+			            opacity: 0.6,
+			            fillOpacity: 0.1,
+			            fillColor: "#f2f2f2"
+			        };
+
+			        // For each country in the countries array create a geojson that will appear on the map
+			        for (var i in countries) {
+				        var countryStorage = [];
+		    			for (var j in data){
+		    				if (countries[i].link == data[j].GeoJSON) {
+		    					countryStorage.push(data[j]);
+		    				}
+		    			}
+				        $.getJSON(countries[i].link, function(data) { 
+						    source = data;
+						   	geojson = L.geoJson(data, {
+					    		'onEachFeature': function (feature, layer) {
+					    			layer.setStyle(defaultStyle);
+						    		layer.on('click', function () {
+										buildSankey(countryStorage);
+										removeClusters(all_markers);
+									})
+									layer.on("mouseover", function (e) {
+								        layer.setStyle(highlightStyle);
+									})
+
+									layer.on("mouseout", function (e) {
+								        layer.setStyle(defaultStyle);
+								    })
+								}
+				   			}).addTo(map)
+						});
+					}
+
+					// This runs through all created markers and pushes them into clusters. This call makes the default markers appear on the map when site is initially loaded
+					for (var i in all_markers){
+						addClusters(all_markers[i])
+					}
+
+					// Function for filter submission
+					$("#buttonSubmit").click(function() {
+						var paymentType = $('#paymentTypeSelection').val(); // Value of payment type filter
+						var company = $('#companySelection').val(); // Value of company filter
+						var project = $('#projectSelection').val(); // Value of project filte
+						// Add another variable tp get data for new filter
+						var datastorage = []; // Will store the data that will be used for the payment flow visualization
+						var pointstorage = []; // Will store the data for the map
+						var markerValue = []; // Will store the values of all the points that will be used for the map
+						var temp1, // Temp storage for if payment type filter selection = "ALL"
+							temp2, // Temp storage for if country filter selection = "ALL"
+							temp3; // Temp storage for if project/government filter selection = "ALL"
+							// Add another temp storage for new filter
+						removeClusters(all_markers) // Remove all clusters from the map so that new points can be added based of filter selection
+
+						for (var i in data){ // Build sankey
+							if (paymentType == "ALL") {
+								temp1 = data[i].PaymentType.toUpperCase();
+							} 
+							if (company == "ALL") {
+								temp2 = data[i].CompanyName.toUpperCase();
+							}
+							if (project == "ALL") {
+								temp3 = data[i].ProjectOrGovernment;
+							}
+							// Add another if statement for new filter
+							if ((paymentType == data[i].PaymentType.toUpperCase() || temp1 == data[i].PaymentType.toUpperCase()) && (company == data[i].CompanyName.toUpperCase() || temp2 == data[i].CompanyName.toUpperCase()) && (project == data[i].ProjectOrGovernment || temp3 == data[i].ProjectOrGovernment)){ // If new filter, copy same format, but with new variables created above
+								datastorage.push(data[i]);
+							} else if (paymentType == company && paymentType == project) { // If statement for if all filters are selected as "ALL", if adding a new filter just add: && paymentType == newfiltervarname
+								datastorage.push(data[i]);
+							}
+						}
+
+						for (var i in all_markers){ // Add points to map
+							markerValue = all_markers[i].options.value; // markerValue is an array of a marker's values
+							if (paymentType == "ALL") {
+								temp1 = markerValue[3].toUpperCase();
+							} 
+							if (company == "ALL") {
+								temp2 = markerValue[1].toUpperCase();
+							}
+							if (project == "ALL") {
+								temp3 = markerValue[2];
+							}
+							// If creating a new filter, you will have to add a new value to the marker 
+							if (paymentType == markerValue[3].toUpperCase() && company == markerValue[1].toUpperCase()) {
+								addClusters(all_markers[i]);
+								pointstorage.push([all_markers[i]._latlng.lat, all_markers[i]._latlng.lng]);
+							}
+							if ((paymentType == markerValue[3].toUpperCase() || temp1 == markerValue[3].toUpperCase()) && (company == markerValue[1].toUpperCase() || temp2 == markerValue[1].toUpperCase()) && (project == markerValue[2] || temp3 == markerValue[2])){ // If adding a new filter, follow same schema, make sure variables match the variables you created above for the new filter
+								addClusters(all_markers[i]);
+								pointstorage.push([all_markers[i]._latlng.lat, all_markers[i]._latlng.lng]);
+							} else if (paymentType == company && paymentType == project) {
+								addClusters(all_markers[i]);
+								pointstorage.push([all_markers[i]._latlng.lat, all_markers[i]._latlng.lng]);
+							}
+						}
+
+						buildSankey(datastorage);
+						map.fitBounds(pointstorage);
+					});
+
+					// Function that runs when the user clicks the filter reset button
+					$("#buttonReset").click(function() {
+						removeClusters(all_markers)
+						reset(all_markers)
+						document.getElementById("intro").style.display="block";
+						document.getElementById("visualization").style.display="none";
+						document.getElementById("nodata").style.display="none";
+						document.getElementById("table").style.display="none";
+						document.getElementById("companySelection").selectedIndex = 0;
+						document.getElementById("paymentTypeSelection").selectedIndex = 0;
+						document.getElementById("projectSelection").selectedIndex = 0;
+						// When adding a new filter access the id location of the filter and set it select index to 0
+						map.setView([64.8462344,-110.1214561], 3);
+					})
+
+					// Function that resets all markers 
+					function reset(all_markers) {
+						for (var i = 0; i < all_markers.length; i++){
+							addClusters(all_markers[i])
+						}
+					}
+
+					// Function calculates the total amount of money given from company(s) to projects/governments
+					function totalPayments(data){
+			        	var total = 0;
+			        	var finalTotal = 0;
+			        	for (var i in data) {
+			        		total += parseFloat(data[i].CADAmount);
+			        	}
+			        	finalTotal = numberWithCommas(round(total, 2));
+			        	return finalTotal;
+			        }
+
+					// Function that builds the payment flow visualization 
+					function buildSankey (data) {
+						document.getElementById("intro").style.display="none"
+						document.getElementById("visualization-chart").innerHTML = '';
+						document.getElementById("table").style.display = "none";
+						document.getElementById("nodata").style.display = "none";
+						$('#visualization-chart').attr('style', '');
+						document.getElementById("visualization").style.display = "block";
+
+						// Created constructor for payment flows, stores most important information necessary for visualization
+						function paymentFlow (paymentFrom, paymentTo, amount, paymentType, province, credit, volume, date, category, abbrev, id){
+							this.paymentFrom = paymentFrom; // Who the payment is from (i.e., an extractive company)
+							this.paymentTo = paymentTo; // Who the payment is to (i.e., project, government)
+							this.amount = amount; // The payment amount
+							this.paymentType = paymentType; // They type of payment
+							this.province = province; // What province the payment occurred in
+							this.credit = credit; // Whether or not the payment is a credit
+							this.volume = volume;
+							this.date = date;
+							this.category = category;
+							this.abbrev = abbrev;
+							this.id = id;
+						};
+
+						// Function that creates the payment flows 
+						function createPaymentFlow (prov_points) {
+							provincePayments = [];
+							for (var i = 0; i < prov_points.length; i++){ // Run through all payments within the province and store all necessary payment information 
+								payment = new paymentFlow(prov_points[i].CompanyName, prov_points[i].Name, round(parseFloat(prov_points[i].CADAmount),2), prov_points[i].PaymentType, prov_points[i].Province, prov_points[i].Credit, prov_points[i].Volume, prov_points[i].ReportEndDate, prov_points[i].ProjectOrGovernment, prov_points[i].AbbreviatedName, prov_points[i].Id);
+								provincePayments.push(payment)
+							}
+							return provincePayments;
+						};
+
+						if (data.length !== 0 && data.length <= 20) { // If there is data for the province, create the following visualization 
+
+							////////////////////////////////////////////////////////////
+							//////////////////////// Set-up ////////////////////////////
+							//////////// By Nadieh Bremer (VisualCinnamon.com) /////////
+							////////////////////////////////////////////////////////////
+
+							var screenWidth = $(window).innerWidth(), 
+								mobileScreen = (screenWidth > 500 ? false : true);
+
+							var margin = {left: -50, top: 10, right: 2, bottom: 10},
+								width = Math.min(screenWidth, 800) - margin.left - margin.right,
+								height = (mobileScreen ? 300 : Math.min(screenWidth, 800)*5/6) - margin.top - margin.bottom;
+										
+							var svg = d3.select("#visualization-chart")
+										.append("div")
+										.classed("svg-container", true)
+										.append("svg")
+										.attr("id", "svg")
+										.attr("preserveAspectRatio", "xMinYMin meet")
+   										.attr("viewBox", "0 0 750 700")
+   										.classed("svg-content-responsive", true); 
+											
+							var wrapper = svg.append("g").attr("class", "chordWrapper")
+										.attr("transform", "translate(" + (width / 2 + margin.left) + "," + (height / 1.8 + margin.top) + ")");;
+										
+							var outerRadius = Math.min(width, height) / 2  - (mobileScreen ? 80 : 100),
+								innerRadius = outerRadius * 0.95,
+								opacityDefault = 0.7, // Default opacity of chords
+								opacityLow = 0.02; // Hover opacity of those chords not hovered over
+								
+							// How many pixels should the two halves be pulled apart
+							var pullOutSize = (mobileScreen? 20 : 50)
+
+							//////////////////////////////////////////////////////
+							//////////////////// Titles on top ///////////////////
+							///////// By Nadieh Bremer (VisualCinnamon.com) //////
+							//////////////////////////////////////////////////////
+
+							var titleWrapper = svg.append("g").attr("class", "chordTitleWrapper"),
+								titleOffset = mobileScreen ? 15 : 40,
+								titleSeparate = mobileScreen ? 30 : 0;
+
+							// Title top left
+							titleWrapper.append("text")
+								.attr("class","title left")
+								.style("font-size", mobileScreen ? "12px" : "16px" )
+								.attr("x", (width/2.25 + margin.left - outerRadius - titleSeparate))
+								.attr("y", titleOffset)
+								.text("Payments From");
+							titleWrapper.append("line")
+								.attr("class","titleLine left")
+								.attr("x1", (width/2 + margin.left - outerRadius - titleSeparate)*0.6)
+								.attr("x2", (width/2 + margin.left - outerRadius - titleSeparate)*1.4)
+								.attr("y1", titleOffset+8)
+								.attr("y2", titleOffset+8);
+							// Title top right
+							titleWrapper.append("text")
+								.attr("class","title right")
+								.style("font-size", mobileScreen ? "12px" : "16px" )
+								.attr("x", (width/2.2 + margin.left + outerRadius + titleSeparate))
+								.attr("y", titleOffset)
+								.text("Payments To");
+							titleWrapper.append("line")
+								.attr("class","titleLine right")
+								.attr("x1", (width/2 + margin.left - outerRadius - titleSeparate)*0.6 + 2*(outerRadius + titleSeparate))
+								.attr("x2", (width/2 + margin.left - outerRadius - titleSeparate)*1.4 + 2*(outerRadius + titleSeparate))
+								.attr("y1", titleOffset+8)
+								.attr("y2", titleOffset+8)
+								.attr("padding", 10)
+							// Title center for hover indication 
+							titleWrapper.append("text")
+								.attr("class","intro")
+								.style("font-size", mobileScreen ? "11px" : "15px" )
+								.attr("x", (width/5 + 30))
+								.attr("y", titleOffset+40)
+								.text("Total: $" + totalPayments(data) + " (CAD). Hover over paths for each amount");
+								
+							////////////////////////////////////////////////////////////
+							/////////////////// Animated gradient //////////////////////
+							//////////// By Nadieh Bremer (VisualCinnamon.com) /////////
+							////////////////////////////////////////////////////////////
+
+							var defs = wrapper.append("defs");
+
+							var linearGradient = defs.append("linearGradient")
+								.attr("id","animatedGradient")
+								.attr("x1","0%")
+								.attr("y1","0%")
+								.attr("x2","100%")
+								.attr("y2","0")
+								.attr("spreadMethod", "reflect");
+
+							linearGradient.append("animate")
+								.attr("attributeName","x1")
+								.attr("values","0%;100%")
+							//	.attr("from","0%")
+							//	.attr("to","100%")
+								.attr("dur","7s")
+								.attr("repeatCount","indefinite");
+
+							linearGradient.append("animate")
+								.attr("attributeName","x2")
+								.attr("values","100%;200%")
+							//	.attr("from","100%")
+							//	.attr("to","200%")
+								.attr("dur","7s")
+								.attr("repeatCount","indefinite");
+
+							linearGradient.append("stop")
+								.attr("offset","5%")
+								.attr("stop-color","#E8E8E8");
+							linearGradient.append("stop")
+								.attr("offset","45%")
+								.attr("stop-color","#A3A3A3");
+							linearGradient.append("stop")
+								.attr("offset","55%")
+								.attr("stop-color","#A3A3A3");
+							linearGradient.append("stop")
+								.attr("offset","95%")
+								.attr("stop-color","#E8E8E8");
+								
+							////////////////////////////////////////////////////////////
+							////////////////////////// Data ////////////////////////////
+							//////////////////// By Julia Conzon ///////////////////////
+							////////////////////////////////////////////////////////////
+
+							var receiver; // To store who receives the payment (e.g., First Nations, government, or project)
+							var allReceivers; // To store all receivers for a province into one array
+							var provincePayments; // To store all payments within a province
+							var payment; // To temporarily store a payment 
+							var company; // To temporarily store a company name
+							var allCompanies; // To store all extractive companies within a province
+							var name; // To store all the names of the start/end nodes of the visualization 
+							var uniqueNames; // To remove any duplicates
+							var matrix_length = 0; // To store the total number of payment flows between all companies and all p/g/fn in one province
+
+							var prov_payments = createPaymentFlow(data); // Store all payment flows in its own array 
+
+							var holder = {};
+
+							// To reduce cluttering, this function runs through the prov_payments array to merge payments that are from the same company and to the same gov/proj 
+							prov_payments.forEach(function(element){
+								var identifier = element.paymentTo + element.paymentFrom;
+								if (holder[identifier]) {
+									holder[identifier].paymentType += " and " + element.paymentType;
+									holder[identifier].amount += element.amount;
+								} else {
+									holder[identifier] = element;
+								};
+							});
+
+							prov_payments = []; 
+
+							for (var identifier in holder) {
+								prov_payments.push(holder[identifier]); // This pushes all merged payments into the prov_payments array
+							}
+
+							var prov_nodes = createNodes(prov_payments); // Create the necessary information for the visualization; prov_nodes will have five elements: [0] = nodes' headers, [1] = sum of all payments based off the filter, [2] = length of the arrays for the matrix, [3] = the start nodes, [4] = popup information
+
+							var sum; // The sum of all costs within a province will be stored
+							var storage; // Will store all important values for the createMatrix function
+							var startNode; // Will store all extractive companies that have paid projects, governments, first nations
+							var popup; // Temporary storage for paths' popup
+							var popupStorage; // Store all popups 
+
+							// This function creates the nodes' headers for the visualization
+							function createNodes (prov_flows){
+								allReceivers = [];
+								allCompanies = [];
+								uniqueNames = [];
+								sum = 0;
+								storage = [];
+								startNode = [];
+								popupStorage = [];
+
+								// Run through all payments based on what the user has selected in the filters
+								for (var i = 0; i < prov_flows.length; i++){
+									if (prov_flows[i].abbrev.length > 0) { // If there is an abbreviated name in the Google Sheet
+										receiver = prov_flows[i].abbrev;
+									} else {
+										receiver = prov_flows[i].paymentTo; 
+									}
+									allReceivers.push(receiver); 
+									company = prov_flows[i].paymentFrom;
+									allCompanies.push(company);
+									sum += prov_flows[i].amount;
+									popup = "Reported on " + prov_flows[i].date + ": " + prov_flows[i].paymentFrom + " paid ";
+						    		if (prov_flows[i].credit == "N") {
+						    			popup += "$" + numberWithCommas(prov_flows[i].amount) + " (CAD) (" + prov_flows[i].paymentType + ")";
+						    		} else {
+						    			popup += "- $" + numberWithCommas(prov_flows[i].amount) + " (CAD) (" + prov_flows[i].paymentType + ")";
+						    		} 
+						    		if (prov_flows[i].category == "P") {
+						    			popup += " for the " + prov_flows[i].paymentTo + " project";
+						    		} else {
+						    			popup += " to " + prov_flows[i].paymentTo;
+						    		}
+									popupStorage.push(popup);
+								};
+
+								// Removes any duplicates from Company Names 
+								$.each(allCompanies, function(i, el){ 
+									if($.inArray(el, uniqueNames) === -1) uniqueNames.push(el);
+								});
+
+								startNode = uniqueNames.length + 2; // How many start nodes there are: all the unique extract company names present in the filter selection and two other nodes to represent the emptyStrokes
+								name = allReceivers.concat("", uniqueNames, ""); // Header names for the nodes: emptyStroke, all the companies names, emptyStroke
+								matrix_length = name.length; // The total number of nodes = length of arrays for the matrix
+
+								storage.push(name) // Store headers of the nodes in the correct order. Needed to build matrix
+								storage.push(sum) // Store sum of all amounts in one province. Needed to build matrix 
+								storage.push(matrix_length) // Store total number of nodes neccessary. Needed to build the matrix
+								storage.push(startNode) // Store the start nodes (i.e., blank spaces and extractive companies' names) 
+								storage.push(popupStorage); // Store all the popup information for the flows between start and end nodes
+
+								return storage;
+							}
+
+							var matrix = []; // Where the matrix for the visualization will be stored
+
+							// This function builds the matrix. To understand more about how the matrix is build refer to: http://www.visualcinnamon.com/2015/08/stretched-chord.html
+							function createMatrix (paymentFlows, otherInfo){ 
+								var emptyPerc = 0.6; // How big the gaps should between start and end nodes 
+
+								for(var i = 0; i < otherInfo[2]; i++) { // Loop through the length of all the nodes necessary to build the diagram
+								    matrix[i] = new Array(otherInfo[2]); // Create a new array within the matrix array with the same length as the amount of nodes
+								    if (i < otherInfo[2] - otherInfo[3]){ // Everything up to emptyStroke
+									    for (var j = 0; j < otherInfo[2]; j++){
+									    	if (j < otherInfo[2] - otherInfo[3]) {
+									    		matrix[i][j] = 0; // Fill in 0 up to the headers
+									    	} else if (j == otherInfo[2] - otherInfo[3]){
+									    		matrix[i][j] = 0;
+									    	} else if (j > otherInfo[2] - otherInfo[3] && j !== otherInfo[2] - 1) { // If adding another company: add an additional else if statement, but adjust company name in the quotations
+									    		if (otherInfo[0].indexOf(paymentFlows[i].paymentFrom) >= 0 && j == otherInfo[0].indexOf(paymentFlows[i].paymentFrom)) {
+									    			matrix[i][j] = paymentFlows[i].amount;
+									    		} else {
+									    			matrix[i][j] = 0;
+									    		}
+									    	} else {
+									    		matrix[i][j] = 0;
+									    	}
+									    }
+									} else if (i == otherInfo[2] - otherInfo[3]) { // emptyStroke
+										for (var j=0; j<otherInfo[2]; j++){
+									    	if (j < otherInfo[2] - otherInfo[3]) {
+									    		matrix[i][j] = 0; // Fill in 0 up to the headers
+									    	} else if (j == otherInfo[2] - otherInfo[3]){
+									    		matrix[i][j] = Math.round(otherInfo[1] * emptyPerc); // emptyStroke
+									    	} else if (j > otherInfo[2] - otherInfo[3] && j !== otherInfo[2] - 1) {
+									    		matrix[i][j] = 0;
+									    	} else {
+									    		matrix[i][j] = 0;
+									    	}
+									    }
+									} else if (i > otherInfo[2] - otherInfo[3] && i !== otherInfo[2] - 1) { // Start Nodes 
+										for (var j=0; j<otherInfo[2]; j++){
+									    	if (j < otherInfo[2] - otherInfo[3]) { // If adding another company: add an additional else if statement, but adjust company name in the quotations
+									    		if (otherInfo[0].indexOf(paymentFlows[j].paymentFrom) >= 0 && i == otherInfo[0].indexOf(paymentFlows[j].paymentFrom)) {
+									    			matrix[i][j] = paymentFlows[j].amount;
+									    		} else {
+									    			matrix[i][j] = 0;
+									    		}
+									    	} else if (j == otherInfo[2] - otherInfo[3]){
+									    		matrix[i][j] = 0;
+									    	} else if (j > otherInfo[2] - otherInfo[3] && j !== otherInfo[2] - 1) {
+									    		matrix[i][j] = 0;
+									    	} else {
+									    		matrix[i][j] = 0;
+									    	}
+									    }
+									} else { // emptyStroke
+										for (var j=0; j<otherInfo[2]; j++){
+									    	if (j < otherInfo[2] - otherInfo[3]) {
+									    		matrix[i][j] = 0; 
+									    	} else if (j == otherInfo[2] - otherInfo[3]){
+									    		matrix[i][j] = 0;
+									    	} else if (j > otherInfo[2] - otherInfo[3] && j !== otherInfo[2] - 1) {
+									    		matrix[i][j] = 0;
+									    	} else {
+									    		matrix[i][j] = Math.round(otherInfo[1] * emptyPerc); // emptystroke
+									    	}
+									    }
+									}
+								}
+								return matrix;
+							}
+
+							var Names = prov_nodes[0]; // The nodes' headers
+
+							var PopupText = prov_nodes[4]; // Text for paths' popups 
+
+							var respondents = prov_nodes[1], // Total payment amount in the province 
+								emptyPerc = 0.6, // What % of the circle should become empty
+								emptyStroke = Math.round(respondents*emptyPerc); 
+
+							var matrix = createMatrix(prov_payments, prov_nodes); // Inputs: all payments from the filter selection and all othe necessary information to create the matrix 
+
+							// Calculate how far the Chord Diagram needs to be rotated clockwise to make the dummy
+							// Invisible chord center vertically
+							var offset = (2 * Math.PI) * (emptyStroke/(respondents + emptyStroke))/4;
+
+							// Custom sort function of the chords to keep them in the original order
+							var chord = customChordLayout() // d3.layout.chord()
+								.padding(.02)
+								.sortChords(d3.descending) // Biggest chord is at the bottom
+								.matrix(matrix)
+
+							var arc = d3.svg.arc()
+								.innerRadius(innerRadius)
+								.outerRadius(outerRadius)
+								.startAngle(startAngle) // startAngle and endAngle now include the offset in degrees
+								.endAngle(endAngle);
+
+							var path = stretchedChord() // Call the stretched chord function 
+								.radius(innerRadius)
+								.startAngle(startAngle)
+								.endAngle(endAngle)
+								.pullOutSize(pullOutSize);
+
+							////////////////////////////////////////////////////////////
+							//////////////////// Draw outer Arcs ///////////////////////
+							//////////// By Nadieh Bremer (VisualCinnamon.com) /////////
+							////////////////////////////////////////////////////////////
+
+							var g = wrapper.selectAll("g.group")
+								.data(chord.groups)
+								.enter().append("g")
+								.attr("class", "group")
+								.on("mouseover", fade(opacityLow))
+								.on("mouseout", fade(opacityDefault));
+
+							g.append("path")
+								.style("stroke", function(d,i) { return (Names[i] === "" ? "none" : "#507ebf"); })
+								.style("fill", function(d,i) { return (Names[i] === "" ? "none" : "#507ebf"); })
+								.style("pointer-events", function(d,i) { return (Names[i] === "" ? "none" : "auto"); })
+								.attr("d", arc)
+								.attr("transform", function(d, i) { //Pull the two slices apart
+											d.pullOutSize = pullOutSize * ( d.startAngle + 0.001 > Math.PI ? -1 : 1);
+											return "translate(" + d.pullOutSize + ',' + 0 + ")";
+								});
+
+							////////////////////////////////////////////////////////////
+							////////////////////// Append Names ////////////////////////
+							//////////// By Nadieh Bremer (VisualCinnamon.com) /////////
+							////////////////////////////////////////////////////////////
+
+							//The text also needs to be displaced in the horizontal directions
+							//And also rotated with the offset in the clockwise direction
+							g.append("text")
+								.each(function(d) { d.angle = ((d.startAngle + d.endAngle) / 2) + offset;})
+								.attr("dy", ".35em")
+								.attr("class", "titles")
+								.style("font-size", mobileScreen ? "8px" : "10px" )
+								.attr("text-anchor", function(d) { return d.angle > Math.PI ? "end" : null; })
+								.attr("transform", function(d,i) { 
+									var c = arc.centroid(d);
+									return "translate(" + (c[0] + d.pullOutSize) + "," + c[1] + ")"
+									+ "rotate(" + (d.angle * 180 / Math.PI - 90) + ")"
+									+ "translate(" + 20 + ",0)"
+									+ (d.angle > Math.PI ? "rotate(180)" : "")
+								})
+							  .text(function(d,i) { return Names[i]; })
+							  .call(wrapChord, 100);
+
+							////////////////////////////////////////////////////////////
+							//////////////////// Draw inner chords /////////////////////
+							//////////// By Nadieh Bremer (VisualCinnamon.com) /////////
+							////////////////////////////////////////////////////////////
+							 
+							wrapper.selectAll("path.chord")
+								.data(chord.chords)
+								.enter().append("path")
+								.attr("class", "chord")
+								.style("stroke", "none")
+								.style("fill", "url(#animatedGradient)") //An SVG Gradient to give the impression of a flow from left to right
+								.style("opacity", function(d) { return (Names[d.source.index] === "" ? 0 : opacityDefault); }) //Make the dummy strokes have a zero opacity (invisible)
+								.style("pointer-events", function(d,i) { return (Names[d.source.index] === "" ? "none" : "auto"); }) //Remove pointer events from dummy strokes
+								.attr("d", path)
+								.on("mouseover", fadeOnChord)
+								.on("mouseout", fade(opacityDefault))	
+								.append("title") // Attatch a title tag - ADDED BY JULIA CONZON
+						          .text(function(d, i) { return PopupText[d.source.index]}); // Include popup information on path between start and end node - ADDED BY JULIA CONZON
+
+							////////////////////////////////////////////////////////////
+							////////////////// Extra Functions /////////////////////////
+							//////////// By Nadieh Bremer (VisualCinnamon.com) /////////
+							////////////////////////////////////////////////////////////
+
+							//Include the offset in de start and end angle to rotate the Chord diagram clockwise
+							function startAngle(d) { return d.startAngle + offset; }
+							function endAngle(d) { return d.endAngle + offset; }
+
+							// Returns an event handler for fading a given chord group
+							function fade(opacity) {
+							  return function(d, i) {
+								wrapper.selectAll("path.chord")
+									.filter(function(d) { return d.source.index !== i && d.target.index !== i && Names[d.source.index] !== ""; })
+									.transition()
+									.style("opacity", opacity);
+							  };
+							}//fade
+
+							// Fade function when hovering over chord
+							function fadeOnChord(d) {
+								var chosen = d;
+								wrapper.selectAll("path.chord")
+									.transition()
+									.style("opacity", function(d) {
+										return d.source.index === chosen.source.index && d.target.index === chosen.target.index ? opacityDefault : opacityLow;
+									});
+							}//fadeOnChord
+
+							/*Taken from http://bl.ocks.org/mbostock/7555321
+							//Wraps SVG text*/
+							function wrapChord(text, width) {
+							  text.each(function() {
+								var text = d3.select(this),
+									words = text.text().split(/\s+/).reverse(),
+									word,
+									line = [],
+									lineNumber = 0,
+									lineHeight = 1.1, // ems
+									y = 0,
+									x = 0,
+									dy = parseFloat(text.attr("dy")),
+									tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
+
+								while (word = words.pop()) {
+								  line.push(word);
+								  tspan.text(line.join(" "));
+								  if (tspan.node().getComputedTextLength() > width) {
+									line.pop();
+									tspan.text(line.join(" "));
+									line = [word];
+									tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+								  }
+								}
+							  });
+
+							}//wrapChord
+						} else if (data.length > 20){ // If there is too much data for the visualization, then create a table
+							$('#visualization-chart').attr('style', '');
+							document.getElementById("intro").style.display="none"
+							document.getElementById("visualization-chart").innerHTML = '';
+							document.getElementById("visualization").style.display = "none";
+							document.getElementById("nodata").style.display = "none";
+							document.getElementById("table").style.display = "block";
+							var tableLegend = document.getElementById("table-legend");
+							tableLegend.innerHTML = "<p>Sorry, your current filter has too much data to render in the flow payment visualization, so it appears as a table. If you click on a row, the map will zoom to the location </p>";
+							// Create a table here 
+							document.getElementById("table-responsive").innerHTML = "";
+							document.getElementById("table-responsive").innerHTML = "<thead><tr id='tableHeaders'><th>Payment From</th><th>Amount (CAD)</th><th>Payment Type</th><th>Payment To</th><th>Date Reported</th></tr></thead>";
+							
+							var tbody = '<tbody id="rows">';
+							for (var i = 0; i < data.length; i++){
+								tbody += '<tr value="'
+								tbody += data[i].Id;
+								tbody += '">';
+								tbody += '<td>';
+								tbody += data[i].CompanyName;
+								tbody += '</td>';
+								tbody += '<td>';
+								tbody += numberWithCommas(round(parseFloat(data[i].CADAmount), 2));
+								tbody += '</td>';
+								tbody += '<td>'
+								tbody += data[i].PaymentType;
+								tbody += '</td>';
+								tbody += '<td>';
+								tbody += data[i].Name;
+								tbody += '</td>';
+								tbody += '<td>';
+								tbody += data[i].ReportEndDate;
+								tbody += '</td>';
+							}
+							tbody += "</tr></tbody";
+							document.getElementById("table-responsive").innerHTML += tbody
+							$("#table-responsive").tablesorter(); // Code from http://tablesorter.com
+							$("#table-responsive").on('click','tr',function(e){
+							    e.preventDefault();
+							    var value = $(this).attr('value');
+							    var points = [];
+							    for (var i in all_markers){
+							    	all_markers[i].options.icon.options.iconSize[0] = 30;
+							    	all_markers[i].options.icon.options.iconSize[1] = 30;
+							    	if (all_markers[i].options.value[4] == value){
+							    		all_markers[i].options.icon.options.iconSize[0] = 40;
+							    		all_markers[i].options.icon.options.iconSize[1] = 40;
+							    		map.setView([all_markers[i]._latlng.lat, all_markers[i]._latlng.lng], 8);
+							    	}
+							    }
+							}); 
+						} else { // else if there is no data for the province output, then there is "NO DATA"
+							$('#visualization-chart').attr('style', '');
+							document.getElementById("table").style.display = "none";
+							document.getElementById("intro").style.display="none"
+							document.getElementById("visualization-chart").innerHTML = '';
+							document.getElementById("visualization").style.display = "none";
+							var chart = document.getElementById("visualization-chart")
+							chart.innerHTML = "";
+							document.getElementById("nodata").style.display = "block";
+						}
+					}
+				}
+				
+			</script>
+		</div>
+	</body>
+</html>
