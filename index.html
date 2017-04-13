@@ -6,7 +6,7 @@
 		<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
 
-		<!-- D3.js -->	
+		<!-- D3.js -->
 	    <script src="http://d3js.org/d3.v3.js"></script>
 		<script src="src/d3.stretched.chord.js"></script>
 		<script src="src/d3.layout.chord.sort.js"></script>
@@ -18,6 +18,9 @@
 
 		<!-- Import mapbox API -->
 		<script src='https://api.mapbox.com/mapbox.js/v2.3.0/mapbox.js'></script>
+
+		<!-- Leaflet Providers -->
+		<script type="text/javascript" href="src/leaflet-providers-master/leaflet-providers.js"></script>
 		
 		<!-- Import Leaflet stylesheet -->
 		<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
@@ -33,7 +36,7 @@
 
 		<!-- Import Leaflet plugin for marker cluster -->
 		<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.css' rel='stylesheet' />
-		<link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.Default.css' rel='stylesheet' />
+		<link href='style/marker-cluster.css' rel='stylesheet' />
 		<script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js'></script>
 
 		<!-- Leaflet Easy Button -->
@@ -214,7 +217,8 @@
 
 				function showInfo(data, tabletop) { // Function to show data from Google Sheet
 		
-				    L.mapbox.accessToken = 'pk.eyJ1IjoianVsY29ueiIsImEiOiJjajAxZjBzenUwNjg2MzNxcnNqMmRndHk2In0.c_6Z_kM1Kno651JoOBDOuQ'; // Access token for Mapbox API
+				    L.mapbox.accessToken = 'pk.eyJ1IjoianVsY29ueiIsImEiOiJjajAxZjBzenUwNjg2MzNxcnNqMmRndHk2In0.c_6Z_kM1Kno651JoOBDOuQ'; // Access token for Mapbox AP
+
 
 					var map = L.mapbox.map('map', 'mapbox.streets', { // Creates new map and associated map id
 						zoomControl: false,
@@ -224,6 +228,10 @@
 						minZoom: 3, 
 						maxZoom: 8 
 					});
+
+					//var layer = L.tileLayer.provider('Stamen.Watercolor').addTo(map);
+
+					var OpenStreetMap_Mapnik = L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png').addTo(map);
 
 					new L.Control.Zoom({ position: 'topright' }).addTo(map); // Create a zoom pad that is on the top right corner of map
 					
